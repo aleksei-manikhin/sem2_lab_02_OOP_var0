@@ -5,7 +5,8 @@ CONFIG -= qt
 
 SOURCES += \
         main.cpp \
-        test.cpp
+        test.cpp \
+        list.cpp
 
 HEADERS += \
     iterator.h \
