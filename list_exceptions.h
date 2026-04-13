@@ -1,0 +1,4 @@
+#ifndef LIST_EXCEPTIONS_H
+#define LIST_EXCEPTIONS_H
+
+#endif // LIST_EXCEPTIONS_H
