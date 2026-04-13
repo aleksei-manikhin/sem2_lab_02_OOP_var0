@@ -1,0 +1,15 @@
+# Папки сборки
+build/
+qtcreator/
+
+# Qt Creator файлы
+*.pro.user
+*.pro.user.*
+*.qmake.stash
+
+# Временные и бинарники
+*.o
+*.obj
+*.exe
+*.dll
+*.so
