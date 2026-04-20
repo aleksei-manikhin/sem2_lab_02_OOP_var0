@@ -42,17 +42,7 @@ List<T>::List() : pHead(nullptr), pTail(nullptr), length(0)
 template<typename T>
 List<T>::List(const List<T>& lst) : pHead(nullptr), pTail(nullptr), length(0)
 {
-    Node* pOrigNode = lst.pHead;
-    while (pOrigNode != nullptr) {
-        Node* pNewNode = new Node{pOrigNode->value, pTail, nullptr};
-        if (pTail == nullptr)
-            pHead = pNewNode;
-        else
-            pTail->next = pNewNode;
-        pTail = pNewNode;
-        ++length;
-        pOrigNode = pOrigNode->next;
-    }
+    add_range(lst);
 }
 
 template<typename T>
@@ -74,8 +64,7 @@ List<T>::List(std::initializer_list<T> lst) : pHead(nullptr), pTail(nullptr), le
 template<typename T>
 int List<T>::get_length() const
 {
-    int result = length;
-    return result;
+    return length;
 }
 
 template<typename T>
@@ -93,13 +82,19 @@ void List<T>::add(const T& elem)
 template<typename T>
 void List<T>::add_range(const List<T>& lst)
 {
-    int sourceLength = lst.length;
-    int copiedCount = 0;
-    Node* pOrigNode = lst.pHead;
-    while (copiedCount < sourceLength) {
-        add(pOrigNode->value);
-        pOrigNode = pOrigNode->next;
-        ++copiedCount;
+    if (this == &lst) { //Если добавляем в список самого себя
+        List<T> temp(lst);
+        Node* pOrigNode = temp.pHead;
+        while (pOrigNode != nullptr) { //Элементы из temp добавляем в изменяемый список
+            add(pOrigNode->value);
+            pOrigNode = pOrigNode->next;
+        }
+    } else {
+        Node* pOrigNode = lst.pHead;
+        while (pOrigNode != nullptr) {
+            add(pOrigNode->value);
+            pOrigNode = pOrigNode->next;
+        }
     }
 }
 
