@@ -13,3 +13,5 @@ qtcreator/
 *.exe
 *.dll
 *.so
+
+*.docx
