@@ -50,6 +50,10 @@ private:
     void swap(List<T>& other) noexcept;
     void appendNodesFrom(const List<T>& source);
     Node* getNodeByIndex(int index);
+    Node* split(Node* pStart);
+    Node* merge(Node* pLeft, Node* pRight, int (*comp)(const T& r1, const T& r2));
+    Node* mergeSort(Node* pStart, int (*comp)(const T& r1, const T& r2));
+    void updateTail();
 };
 
 template<typename T>
@@ -161,19 +165,13 @@ void List<T>::removeElem(int index)
 template<typename T>
 void List<T>::sort(int (*comp)(const T& r1, const T& r2))
 {
-    if (comp == nullptr)
+    if (comp == nullptr) {
         throw ListNullPointer("comparator pointer is null");
-    bool swapped = true;
-    while (swapped) {
-        swapped = false;
-        for (Node* pNode = pHead; pNode != nullptr && pNode->next != nullptr; pNode = pNode->next) {
-            if (comp(pNode->value, pNode->next->value) > 0) {
-                T temp = pNode->value;
-                pNode->value = pNode->next->value;
-                pNode->next->value = temp;
-                swapped = true;
-            }
-        }
+    }
+
+    if (length > 1) {
+        pHead = mergeSort(pHead, comp);
+        updateTail();
     }
 }
 
@@ -212,6 +210,84 @@ void List<T>::appendNodesFrom(const List<T>& source)
     while (pOrigNode != nullptr) {
         add(pOrigNode->value);
         pOrigNode = pOrigNode->next;
+    }
+}
+
+template<typename T>
+typename List<T>::Node* List<T>::split(Node* pStart)
+{
+    Node* pSecondPart = nullptr;
+
+    if (pStart != nullptr && pStart->next != nullptr) {
+        Node* pSlow = pStart;
+        Node* pFast = pStart->next;
+
+        while (pFast != nullptr && pFast->next != nullptr) {
+            pSlow = pSlow->next;
+            pFast = pFast->next->next;
+        }
+
+        pSecondPart = pSlow->next;
+        pSlow->next = nullptr;
+        pSecondPart->prev = nullptr;
+    }
+
+    return pSecondPart;
+}
+
+template<typename T>
+typename List<T>::Node* List<T>::merge(Node* pLeft,Node* pRight,int (*comp)(const T& r1, const T& r2))
+{
+    Node* pResultHead = nullptr;
+    Node* pResultTail = nullptr;
+
+    while (pLeft != nullptr || pRight != nullptr) {
+        Node* pSelected = nullptr;
+        if (pRight == nullptr || (pLeft != nullptr && comp(pLeft->value, pRight->value) <= 0)) {
+            pSelected = pLeft;
+            pLeft = pLeft->next;
+        } else {
+            pSelected = pRight;
+            pRight = pRight->next;
+        }
+        pSelected->prev = pResultTail;
+        pSelected->next = nullptr;
+        if (pResultTail == nullptr) {
+            pResultHead = pSelected;
+        } else {
+            pResultTail->next = pSelected;
+        }
+
+        pResultTail = pSelected;
+    }
+    return pResultHead;
+}
+
+template<typename T>
+typename List<T>::Node* List<T>::mergeSort(Node* pStart, int (*comp)(const T& r1, const T& r2))
+{
+    Node* pResult = pStart;
+
+    if (pStart != nullptr && pStart->next != nullptr) {
+        Node* pSecondPart = split(pStart);
+
+        Node* pLeft = mergeSort(pStart, comp);
+        Node* pRight = mergeSort(pSecondPart, comp);
+
+        pResult = merge(pLeft, pRight, comp);
+    }
+
+    return pResult;
+}
+
+template<typename T>
+void List<T>::updateTail()
+{
+    pTail = pHead;
+    if (pTail != nullptr) {
+        while (pTail->next != nullptr) {
+            pTail = pTail->next;
+        }
     }
 }
 
