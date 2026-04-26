@@ -22,6 +22,8 @@ public:
     void setElem(int index, const T& elem);
     T& getElem(int index);
     void removeElem(int index);
+    void sort(int (*comp)(const T& r1, const T& r2));
+    int getIndex(const T& elem) const;
     List<T> combine(const List<T>& lst);
     ~List();
 
@@ -146,6 +148,33 @@ void List<T>::removeElem(int index)
 
     delete pNode;
     --length;
+}
+
+template<typename T>
+void List<T>::sort(int (*comp)(const T& r1, const T& r2))
+{
+    if (comp == nullptr)
+        throw ListInvalidArgument("comparator pointer is null");
+    bool swapped = true;
+    while (swapped) {
+        swapped = false;
+        for (Node* pNode = pHead; pNode != nullptr && pNode->next != nullptr; pNode = pNode->next) {
+            if (comp(pNode->value, pNode->next->value) > 0) {
+                T temp = pNode->value;
+                pNode->value = pNode->next->value;
+                pNode->next->value = temp;
+                swapped = true;
+            }
+        }
+    }
+}
+
+template<typename T>
+int List<T>::getIndex(const T& elem) const
+{
+    int result = 0;
+    for (const Node* pNode = pHead; pNode != nullptr && pNode->value != elem; pNode = pNode->next, ++result);
+    return (result < length) ? result : -1;
 }
 
 template<typename T>
