@@ -3,6 +3,8 @@
 
 #include <initializer_list>
 #include <utility>
+#include "list_exceptions.h"
+
 template<typename T>
 class List
 {
@@ -13,9 +15,13 @@ public:
     explicit List(std::initializer_list<T> lst);
     List<T>& operator=(const List<T>& lst);
     List<T>& operator=(List<T>&& lst) noexcept;
-    int get_length() const; //const - нельзя менять поля объекта
-    void add(const T& elem); //const - нельзя менять elem
-    void add_range(const List<T>& lst);
+    int getLength() const;
+    void add(const T& elem);
+    void addRange(const List<T>& lst);
+    void addRange(T* arr, int size);
+    void setElem(int index, const T& elem);
+    T& getElem(int index);
+    void removeElem(int index);
     List<T> combine(const List<T>& lst);
     ~List();
 
@@ -32,6 +38,8 @@ private:
     int length;
 
     void swap(List<T>& other) noexcept;
+    void appendNodesFrom(const List<T>& source);
+    Node* getNodeByIndex(int index);
 };
 
 template<typename T>
@@ -42,7 +50,7 @@ List<T>::List() : pHead(nullptr), pTail(nullptr), length(0)
 template<typename T>
 List<T>::List(const List<T>& lst) : pHead(nullptr), pTail(nullptr), length(0)
 {
-    add_range(lst);
+    appendNodesFrom(lst);
 }
 
 template<typename T>
@@ -62,9 +70,10 @@ List<T>::List(std::initializer_list<T> lst) : pHead(nullptr), pTail(nullptr), le
 }
 
 template<typename T>
-int List<T>::get_length() const
+int List<T>::getLength() const
 {
-    return length;
+    int result = length;
+    return result;
 }
 
 template<typename T>
@@ -80,29 +89,103 @@ void List<T>::add(const T& elem)
 }
 
 template<typename T>
-void List<T>::add_range(const List<T>& lst)
+void List<T>::addRange(const List<T>& lst)
 {
-    if (this == &lst) { //Если добавляем в список самого себя
+    if (this == &lst) {
         List<T> temp(lst);
-        Node* pOrigNode = temp.pHead;
-        while (pOrigNode != nullptr) { //Элементы из temp добавляем в изменяемый список
-            add(pOrigNode->value);
-            pOrigNode = pOrigNode->next;
+        appendNodesFrom(temp);
+    } else {
+        appendNodesFrom(lst);
+    }
+}
+
+template<typename T>
+void List<T>::addRange(T* arr, int size)
+{
+    if (size < 0) {
+        throw ListInvalidArgument("size must be non-negative");
+    }
+    if (arr == nullptr && size > 0) {
+        throw ListInvalidArgument("array pointer is null");
+    }
+    for (int i = 0; i < size; ++i) {
+        add(arr[i]);
+    }
+}
+
+template<typename T>
+void List<T>::setElem(int index, const T& elem)
+{
+    Node* pNode = getNodeByIndex(index);
+    pNode->value = elem;
+}
+
+template<typename T>
+T& List<T>::getElem(int index)
+{
+    Node* pNode = getNodeByIndex(index);
+    return pNode->value;
+}
+
+template<typename T>
+void List<T>::removeElem(int index)
+{
+    Node* pNode = getNodeByIndex(index);
+
+    if (pNode->prev != nullptr) {
+        pNode->prev->next = pNode->next;
+    } else {
+        pHead = pNode->next;
+    }
+
+    if (pNode->next != nullptr) {
+        pNode->next->prev = pNode->prev;
+    } else {
+        pTail = pNode->prev;
+    }
+
+    delete pNode;
+    --length;
+}
+
+template<typename T>
+void List<T>::appendNodesFrom(const List<T>& source)
+{
+    const Node* pOrigNode = source.pHead;
+    while (pOrigNode != nullptr) {
+        add(pOrigNode->value);
+        pOrigNode = pOrigNode->next;
+    }
+}
+
+template<typename T>
+typename List<T>::Node* List<T>::getNodeByIndex(int index) //typename показывает, что List<T>::Node* это тип
+{
+    if (index < 0 || index >= length) {
+        throw ListIndexOutOfRange("index is out of range");
+    }
+
+    Node* pNode = nullptr;
+    if (index < length / 2) {
+        pNode = pHead;
+        for (int i = 0; i < index; ++i) {
+            pNode = pNode->next;
         }
     } else {
-        Node* pOrigNode = lst.pHead;
-        while (pOrigNode != nullptr) {
-            add(pOrigNode->value);
-            pOrigNode = pOrigNode->next;
+        pNode = pTail;
+        for (int i = length - 1; i > index; --i) {
+            pNode = pNode->prev;
         }
     }
+
+    return pNode;
 }
 
 template<typename T>
 List<T> List<T>::combine(const List<T>& lst)
 {
     List<T> result(*this);
-    result.add_range(lst);
+    result.addRange(lst);
     return result;
 }
 
@@ -110,10 +193,11 @@ template<typename T>
 List<T>& List<T>::operator=(const List<T>& lst)
 {
     if (this != &lst) {
-        List<T> temp(lst); //когда temp выйдет из функции, его деструктор удалит старое содержимое
-        swap(temp); //Если конструктор копирования не смог создать temp, текущий объект не измениться.
+        List<T> temp(lst);
+        swap(temp);
     }
-    return *this;
+    List<T>& result = *this;
+    return result;
 }
 
 template<typename T>
@@ -123,7 +207,8 @@ List<T>& List<T>::operator=(List<T>&& lst) noexcept
         List<T> temp(std::move(lst));
         swap(temp);
     }
-    return *this;
+    List<T>& result = *this;
+    return result;
 }
 
 template<typename T>
