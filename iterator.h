@@ -32,7 +32,7 @@ template<typename T>
 Iterator<T>& Iterator<T>::next()
 {
     if (is_end()) {
-        throw ListIndexOutOfRange("iterator is at end");
+        throw ListIteratorOutOfRange("iterator is at end");
     }
 
     pCurrent = pCurrent->next;
@@ -43,7 +43,7 @@ template<typename T>
 T Iterator<T>::value()
 {
     if (is_end()) {
-        throw ListIndexOutOfRange("iterator is at end");
+        throw ListIteratorOutOfRange("iterator is at end");
     }
 
     return pCurrent->value;
@@ -65,7 +65,7 @@ template<typename T>
 T& Iterator<T>::operator*()
 {
     if (is_end()) {
-        throw ListIndexOutOfRange("iterator is at end");
+        throw ListIteratorOutOfRange("iterator is at end");
     }
 
     return pCurrent->value;

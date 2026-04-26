@@ -11,10 +11,26 @@ public:
     }
 };
 
+class ListNullPointer : public ListInvalidArgument
+{
+public:
+    explicit ListNullPointer(const char* message) : ListInvalidArgument(message)
+    {
+    }
+};
+
 class ListIndexOutOfRange : public std::out_of_range
 {
 public:
     explicit ListIndexOutOfRange(const char* message) : std::out_of_range(message)
+    {
+    }
+};
+
+class ListIteratorOutOfRange : public ListIndexOutOfRange
+{
+public:
+    explicit ListIteratorOutOfRange(const char* message) : ListIndexOutOfRange(message)
     {
     }
 };

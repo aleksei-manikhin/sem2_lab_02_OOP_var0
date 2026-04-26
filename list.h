@@ -116,7 +116,7 @@ void List<T>::addRange(T* arr, int size)
         throw ListInvalidArgument("size must be non-negative");
     }
     if (arr == nullptr && size > 0) {
-        throw ListInvalidArgument("array pointer is null");
+        throw ListNullPointer("array pointer is null");
     }
     for (int i = 0; i < size; ++i) {
         add(arr[i]);
@@ -162,7 +162,7 @@ template<typename T>
 void List<T>::sort(int (*comp)(const T& r1, const T& r2))
 {
     if (comp == nullptr)
-        throw ListInvalidArgument("comparator pointer is null");
+        throw ListNullPointer("comparator pointer is null");
     bool swapped = true;
     while (swapped) {
         swapped = false;

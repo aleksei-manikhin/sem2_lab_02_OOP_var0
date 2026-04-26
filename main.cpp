@@ -1,14 +1,7 @@
-#include <iostream>
-
-using namespace std;
-#include "list.h"
+#include "test.h"
 
 int main()
 {
-    cout << "Hello World!" << endl;
-    List<int> a;
-    List<int> b;
-    a = b;
-    a = std::move(b);
-    return 0;
+    ListTests tests;
+    return tests.runAll();
 }
