@@ -6,6 +6,9 @@
 #include "list_exceptions.h"
 
 template<typename T>
+class Iterator;
+
+template<typename T>
 class List
 {
 public:
@@ -30,6 +33,9 @@ public:
     ~List();
 
 private:
+    template<typename U>
+    friend class Iterator;
+
     struct Node
     {
         T value;
