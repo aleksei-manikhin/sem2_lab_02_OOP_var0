@@ -18,13 +18,16 @@ private:
     static int intComparatorAsc(const int& left, const int& right);
 
     void testListBasicOperations();
-    void testListRangeCombineAndIndex();
-    void testListSelfRangeAndArrayRange();
+    void testListAddRangeAndCombine();
+    void testListSelfAddRange();
     void testListRemoveAndSort();
-    void testListCopyMoveSemantics();
-    void testListExceptions();
+    void testListCopySemantic();
+    void testListMoveSemantic();
+    void testListExceptionArguments();
+    void testListExceptionIndices();
     void testIteratorTraversalAndAccess();
-    void testIteratorCompareAndExceptions();
+    void testIteratorCompare();
+    void testIteratorEndExceptions();
 };
 
 #endif // TEST_H
