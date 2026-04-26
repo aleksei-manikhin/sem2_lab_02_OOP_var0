@@ -24,6 +24,8 @@ public:
     void removeElem(int index);
     void sort(int (*comp)(const T& r1, const T& r2));
     int getIndex(const T& elem) const;
+    T* toArray();
+    T& operator[](int index);
     List<T> combine(const List<T>& lst);
     ~List();
 
@@ -175,6 +177,26 @@ int List<T>::getIndex(const T& elem) const
     int result = 0;
     for (const Node* pNode = pHead; pNode != nullptr && pNode->value != elem; pNode = pNode->next, ++result);
     return (result < length) ? result : -1;
+}
+
+template<typename T>
+T* List<T>::toArray()
+{
+    T* result = nullptr;
+    if (length > 0) {
+        result = new T[length];
+        int index = 0;
+        for (const Node* pNode = pHead; pNode != nullptr; pNode = pNode->next, ++index) {
+            result[index] = pNode->value;
+        }
+    }
+    return result;
+}
+
+template<typename T>
+T& List<T>::operator[](int index)
+{
+    return getElem(index);
 }
 
 template<typename T>
